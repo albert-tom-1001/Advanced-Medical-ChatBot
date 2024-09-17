@@ -12,13 +12,24 @@ from langchain.memory import ConversationBufferMemory
 from dotenv import load_dotenv
 import spacy
 
-# Load environment variables
-load_dotenv()
-os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+# Function to get environment variables
+def get_env_variable(var_name):
+    if 'STREAMLIT_RUNTIME_ENV' in os.environ:
+        # We're running on Streamlit Cloud
+        return st.secrets[var_name]
+    else:
+        # We're running locally
+        from dotenv import load_dotenv
+        load_dotenv()
+        return os.getenv(var_name)
 
 # Set API keys
-os.environ['OPENAI_API_KEY'] = os.getenv("OPENAI_API_KEY")
-groq_api_key = os.getenv('GROQ_API_KEY')
+openai_api_key = get_env_variable("OPENAI_API_KEY")
+groq_api_key = get_env_variable("GROQ_API_KEY")
+
+# Set environment variables
+os.environ['OPENAI_API_KEY'] = openai_api_key
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # Create a folder for storing embeddings if it doesn't exist
 EMBED_STORE_DIR = "embed_store"
